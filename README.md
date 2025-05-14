@@ -12,6 +12,11 @@ A sophisticated network security monitoring system with real-time device detecti
 - Threat intelligence integration (VirusTotal, AbuseIPDB)
 - Web-based dashboard with live updates
 - Alerting system for suspicious activities
+- Default credentials:
+
+Username: admin
+
+Password: admin123
 
 ## Requirements
 
