@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Alerts{% endblock %}
+
+{% block content %}
+<div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+        <h6 class="m-0 font-weight-bold text-primary">Security Alerts</h6>
+        <div>
+            <button class="btn btn-sm btn-primary" id="refreshAlerts">
+                <i class="fas fa-sync-alt me-1"></i> Refresh
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="alertsTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Severity</th>
+                        <th>Message</th>
+                        <th>Device</th>
+                        <th>Time</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for alert in alerts %}
+                    <tr class="{% if alert['severity'] == 'High' %}table-danger{% elif alert['severity'] == 'Medium' %}table-warning{% endif %}">
+                        <td>{{ alert['alert_type'] }}</td>
+                        <td><span class="badge bg-{% if alert['severity'] == 'High' %}danger{% elif alert['severity'] == 'Medium' %}warning{% else %}primary{% endif %}">{{ alert['severity'] }}</span></td>
+                        <td>{{ alert['message'] }}</td>
+                        <td>{{ alert['ip'] }} ({{ alert['mac'] }})</td>
+                        <td>{{ alert['timestamp'] }}</td>
+                        <td>
+                            <button class="btn btn-sm btn-info" onclick="acknowledgeAlert({{ alert['id'] }})">
+                                <i class="fas fa-check"></i> Acknowledge
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+$(document).ready(function() {
+    // Initialize DataTable
+    $('#alertsTable').DataTable({
+        order: [[4, 'desc']]  // Sort by timestamp descending
+    });
+    
+    // Refresh button
+    $('#refreshAlerts').click(function() {
+        location.reload();
+    });
+});
+
+function acknowledgeAlert(alertId) {
+    $.ajax({
+        url: '/api/acknowledge_alert',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ alert_id: alertId }),
+        success: function() {
+            location.reload();
+        }
+    });
+}
+</script>
+{% endblock %}
